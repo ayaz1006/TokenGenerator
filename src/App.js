@@ -1,24 +1,37 @@
-import logo from './logo.svg';
-import './App.css';
+import * as React from "react";
+import Container from "@mui/material/Container";
+import Form from "./components/Form";
+import { CssBaseline } from "@mui/material";
+import Typography from "@mui/material/Typography";
 
 function App() {
   return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
-    </div>
+    <>
+      <CssBaseline />
+      <Typography
+        variant="h4"
+        sx={{
+          textAlign: "center",
+          color: "primary.main",
+          marginBottom: 2,
+          fontWeight: "bold",
+          paddingTop: 4,
+        }}
+      >
+        Token Generator
+      </Typography>
+      <Container
+        sx={{
+          display: "flex",
+          flexDirection: "column",
+          alignItems: "center",
+          justifyContent: "center",
+          padding: { xs: 2, sm: 3, md: 4 },
+        }}
+      >
+        <Form />
+      </Container>
+    </>
   );
 }
 
