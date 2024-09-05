@@ -1,12 +1,11 @@
-import * as React from "react";
+import React, { useState } from "react";
 import Box from "@mui/material/Box";
 import TextField from "@mui/material/TextField";
 import Button from "@mui/material/Button";
 import Typography from "@mui/material/Typography";
-import { useState } from "react";
 
-export default function FormPropsTextFields() {
-  // State object for form fields
+export default function Form({ onGenerate, onClear }) {
+  // State to manage form input values
   const [formValues, setFormValues] = useState({
     blueTokensNumber: "",
     blueTokenPrefix: "",
@@ -16,54 +15,67 @@ export default function FormPropsTextFields() {
     redTokensPerRow: "",
   });
 
-  // State object for validation errors
-  const [errors, setErrors] = useState({
-    blueTokensNumber: "",
-    blueTokenPrefix: "",
-    blueTokensPerRow: "",
-    redTokensNumber: "",
-    redTokenPrefix: "",
-    redTokensPerRow: "",
-  });
+  // State to manage validation errors
+  const [errors, setErrors] = useState({});
 
-  // Handle input changes for all fields
+  // Handles input changes and sanitizes input for number fields
   const handleChange = (event) => {
     const { id, value } = event.target;
+    // Sanitize input for number fields
+    const sanitizedValue =
+      id.includes("PerRow") || id.includes("TokensNumber")
+        ? value.replace(/[^\d]/g, "")
+        : value;
+
     setFormValues((prevValues) => ({
       ...prevValues,
-      [id]: value,
+      [id]: sanitizedValue,
     }));
   };
 
-  // Validate form fields
+  // Validates form input values and sets errors
   const validateForm = () => {
     let isValid = true;
     const newErrors = {};
 
-    // Check each form field for validity
     Object.keys(formValues).forEach((key) => {
-      if (!formValues[key]) {
-        newErrors[key] = "This field is required.";
+      if (
+        (key.includes("Number") || key.includes("PerRow")) &&
+        (!/^\d+$/.test(formValues[key]) || formValues[key] === "")
+      ) {
+        newErrors[key] = "Please enter a positive whole number.";
+        isValid = false;
+      } else if (key.includes("PerRow") && parseInt(formValues[key], 10) < 1) {
+        newErrors[key] = "Tokens per row must be greater than or equal to 1.";
         isValid = false;
       } else {
-        newErrors[key] = "";
+        newErrors[key] = ""; // Clear error if input is valid
       }
     });
 
-    // Update errors state
     setErrors(newErrors);
     return isValid;
   };
 
-  // Handle form submission
+  // Handles form submission and generates tokens if form is valid
   const handleGenerate = () => {
     if (validateForm()) {
-      // Form is valid, perform the generate logic here
-      console.log("Form submitted with values:", formValues);
+      onGenerate({
+        blueTokens: {
+          number: parseInt(formValues.blueTokensNumber, 10),
+          prefix: formValues.blueTokenPrefix,
+          tokensPerRow: parseInt(formValues.blueTokensPerRow, 10),
+        },
+        redTokens: {
+          number: parseInt(formValues.redTokensNumber, 10),
+          prefix: formValues.redTokenPrefix,
+          tokensPerRow: parseInt(formValues.redTokensPerRow, 10),
+        },
+      });
     }
   };
 
-  // Clear all form fields and validation errors
+  // Clears form values and notifies parent to clear tokens
   const handleClear = () => {
     setFormValues({
       blueTokensNumber: "",
@@ -73,14 +85,8 @@ export default function FormPropsTextFields() {
       redTokenPrefix: "",
       redTokensPerRow: "",
     });
-    setErrors({
-      blueTokensNumber: "",
-      blueTokenPrefix: "",
-      blueTokensPerRow: "",
-      redTokensNumber: "",
-      redTokenPrefix: "",
-      redTokensPerRow: "",
-    });
+    setErrors({});
+    onClear(); // Notify the parent to clear tokens
   };
 
   return (
@@ -124,12 +130,12 @@ export default function FormPropsTextFields() {
             required
             id="blueTokensNumber"
             label="Number of Blue Tokens"
-            type="number"
+            type="text"
             variant="outlined"
             value={formValues.blueTokensNumber}
             onChange={handleChange}
-            error={!!errors.blueTokensNumber} // Display error state
-            helperText={errors.blueTokensNumber}
+            error={!!errors.blueTokensNumber} // Show error if validation fails
+            helperText={errors.blueTokensNumber} // Display error message
           />
           <TextField
             required
@@ -146,7 +152,7 @@ export default function FormPropsTextFields() {
             required
             id="blueTokensPerRow"
             label="Blue Tokens Per Row"
-            type="number"
+            type="text"
             variant="outlined"
             value={formValues.blueTokensPerRow}
             onChange={handleChange}
@@ -179,7 +185,7 @@ export default function FormPropsTextFields() {
             required
             id="redTokensNumber"
             label="Number of Red Tokens"
-            type="number"
+            type="text"
             variant="outlined"
             value={formValues.redTokensNumber}
             onChange={handleChange}
@@ -201,7 +207,7 @@ export default function FormPropsTextFields() {
             required
             id="redTokensPerRow"
             label="Red Tokens Per Row"
-            type="number"
+            type="text"
             variant="outlined"
             value={formValues.redTokensPerRow}
             onChange={handleChange}
