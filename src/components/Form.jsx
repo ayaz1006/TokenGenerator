@@ -53,6 +53,16 @@ export default function Form({ onGenerate, onClear }) {
       }
     });
 
+    // Validate token prefix fields
+    if (formValues.blueTokenPrefix.trim() === "") {
+      newErrors.blueTokenPrefix = "Blue Token Prefix is mandatory.";
+      isValid = false;
+    }
+    if (formValues.redTokenPrefix.trim() === "") {
+      newErrors.redTokenPrefix = "Red Token Prefix is mandatory.";
+      isValid = false;
+    }
+
     setErrors(newErrors);
     return isValid;
   };
