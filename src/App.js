@@ -60,7 +60,7 @@ function App() {
       <Container
         sx={{
           display: "flex",
-          flexDirection: "column",
+          flexDirection: "row",
           alignItems: "center",
           justifyContent: "center",
           padding: { xs: 2, sm: 3, md: 4 },
